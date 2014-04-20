@@ -1,3 +1,4 @@
+<!--
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
 "http://www.w3.org/TR/html4/strict.dtd">
 
@@ -8,8 +9,67 @@
         <link type= "text/css" rel="stylesheet" href="main.css">
     </head>
     <body>
-        <div id="header"></div>
+        <div id="header">
+            <h1>WaterLogging Mashup</h1>
+        </div>
+        <div id="search"></div>
         <div id="main"></div>
         <div id="footer"></div>
     </body>
+</html>
+-->
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+    <link rel="stylesheet" href="main.css">
+
+    <script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=7xfCf9eh3Gdfdf4U2UoCqNxC"></script>
+    <!-- 加载百度地图样式信息窗口 -->
+    <script type="text/javascript" src="http://api.map.baidu.com/library/SearchInfoWindow/1.5/src/SearchInfoWindow_min.js"></script>
+    <link rel="stylesheet" href="http://api.map.baidu.com/library/SearchInfoWindow/1.5/src/SearchInfoWindow_min.css" />
+    <!-- 加载城市列表 -->
+    <script type="text/javascript" src="http://api.map.baidu.com/library/CityList/1.2/src/CityList_min.js"></script>
+
+
+    <title>叠加麻点图Demo</title>
+</head>
+<body>
+    <div id="header">
+        <h1>Waterlogging Mashup</h1>
+    </div>
+    <div id="search">
+        <input type="search" id="keywords" placehoder="输入地点">
+        <button id="searchBtn">搜索</button>
+    </div>
+
+    <div id="result">
+         <ul id="resultList">
+
+         </ul>
+    </div>
+
+    <div id="l-map"></div>
+
+           <!--城市列表-->
+    <div class="sel_container">
+        <strong id="curCity">北京市</strong>
+        [<a id="curCityText" href="javascript:void(0)">更换城市</a>]
+    </div>
+    <div class="map_popup" id="cityList" style="display:none;">
+        <div class="popup_main">
+            <div class="title">城市列表</div>
+            <div class="cityList" id="citylist_container"></div>
+            <button id="popup_close"></button>
+        </div>
+    </div>
+    <div>
+        <p id="myTest">testsdwdqwfwfewfwerfewfewfsfsgggg</p>
+    </div>
+
+
+    <script type="text/javascript" src="main.js"></script>
+</body>
 </html>
