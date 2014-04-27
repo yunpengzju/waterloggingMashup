@@ -1,87 +1,120 @@
-body, html{
-    width: 100%;
-    height: 100%;
-
-    margin:0;
-}
-#l-map {
-    margin-right: 300px;
-    height: 100%;
-    overflow: hidden;
-}
-#result {
-    border-left:1px dotted #999;
-    height:100%;
-    width:295px;
-    position:absolute;
-    /*float: right;*/
-    top:0px;
-    right:0px;
+body{
+    font-family:"微软雅黑";
     font-size:12px;
 }
-dl,dt,dd,ul,li{
+#pageHeader{
+    background:rgb(249, 249, 249);
+    border-bottom:1px solid #EDEDED;
+}
+#pageMiddle{
+    background:rgb(253, 253, 253);
+    border-bottom:1px solid #EDEDED;
+    margin-bottom:5px;
+    padding:15px 0;
+}
+#filterBox{
+    clear: both;
+}
+#filterBox li a.activate{
+    color:red;
+    text-decoration:none;
+    cursor:default;
+}
+#mapBox{
+    width:100%;
+    height:500px;
+    position:relative;
+}
+#map{
+    height:100%;
+    position:absolute;
+    top:0;
+    left:0;
+    bottom:0;
+    right:400px;
+}
+#mapPanel{
+    position:absolute;
+    width:400px;
+    top:0;
+    bottom:0;
+    right:0;
+    height:100%;
+}
+#mapListWrap{
+    position:absolute;
+    left:0px;
+    right:0px;
+    top:0px;
+    bottom:41px;
+    overflow:auto;
+}
+img{
+    max-width:none;
+}
+h1{
+    float:left;
+    font-size:24px;
+    font-family:'微软雅黑';
+    color:red;
+}
+h2{
+    float:left;
+    margin-left:20px;
+    font-size:16px;
+    font-weight:normal;
+}
+.dl-horizontal dt{
+    width:50px;
+}
+.dl-horizontal dd{
+    margin-left:50px;
+}
+.dl-horizontal{
+    margin:0px;
+}
+#chgMode{
+    margin-right:10px;
+}
+#toggleBtn{
+    margin-right:10px;
+}
+.BMapLib_nav_tab_content input{
+    padding:0px;
     margin:0;
-    padding:0;
-    list-style:none;
 }
-dt{
-    font-size:14px;
-    font-family:"微软雅黑";
-    font-weight:bold;
-    border-bottom:1px dotted #000;
-    padding:5px 0 5px 5px;
-    margin:5px 0;
+#selectedValue{
+    width:300px;
+    padding-left:5px;
 }
-dd{
-    padding:5px 0 0 5px;
+#selectedValue .span1{
+    white-space: nowrap;
+    padding:0 5px;
+    width:auto;
+    text-align:center;
+    background:#e1e1e1;
+    height:30px;
+    line-height:30px;
+    border-radius:3px;
 }
-li{
-    line-height:28px;
+#selectedValue .icon-remove{
+    margin-left:5px;
+    cursor:pointer;
 }
-
-
-
-    .cityList{
-        height: 320px;
-        width:372px;
-        overflow-y:auto;
-    }
-    .sel_container{
-        /*z-index:9999;*/
-        font-size:12px;
-        position:absolute;
-        right:300px;
-        top:0px;
-        width:140px;
-        background:rgba(255,255,255,0.8);
-        height:30px;
-        line-height:30px;
-        padding:5px;
-    }
-    .map_popup {
-        position: absolute;
-        z-index: 200000;
-        width: 382px;
-        height: 344px;
-        right:320px;
-        top:40px;
-    }
-    .map_popup .popup_main {
-        background:#fff;
-        border: 1px solid #8BA4D8;
-        height: 100%;
-        overflow: hidden;
-        position: absolute;
-        width: 100%;
-        z-index: 2;
-    }
-    .map_popup .title {
-        background: url("http://map.baidu.com/img/popup_title.gif") repeat scroll 0 0 transparent;
-    color: #6688CC;font-size: 12px;font-weight: bold;height: 24px;line-height: 25px;padding-left: 7px;}
-    .map_popup button {background: url("http://map.baidu.com/img/popup_close.gif") no-repeat scroll 0 0 transparent;
-    border: 0 none;cursor: pointer;height: 12px;position: absolute;right: 4px;top: 6px;width: 12px;
+#listBox{
+    padding-bottom:20px;
 }
-
-h1 {
-    text-align: center;
+#listWrap{
+    border-color:#DDDDDD;
+    border-style:solid;
+    border-width:0px 1px 1px 1px;
+}
+#listWrap table{
+    margin-bottom:0px;
+}
+#mapPager {
+    position:absolute;
+    margin:0px;
+    bottom:0px;
+    left:50px;
 }

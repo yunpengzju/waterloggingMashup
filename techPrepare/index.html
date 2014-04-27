@@ -24,6 +24,7 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+    <link href="css/bootstrap.css" rel="stylesheet">
     <link rel="stylesheet" href="main.css">
 
     <script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=7xfCf9eh3Gdfdf4U2UoCqNxC"></script>
@@ -31,42 +32,56 @@
     <script type="text/javascript" src="http://api.map.baidu.com/library/SearchInfoWindow/1.5/src/SearchInfoWindow_min.js"></script>
     <link rel="stylesheet" href="http://api.map.baidu.com/library/SearchInfoWindow/1.5/src/SearchInfoWindow_min.css" />
     <!-- 加载城市列表 -->
+    <script type="text/javascript" src="js/jquery.js"></script>
+    <script src="js/jquery.pager.js" type="text/javascript"></script>
     <script type="text/javascript" src="http://api.map.baidu.com/library/CityList/1.2/src/CityList_min.js"></script>
+    <script type="text/javascript" src="http://api.map.baidu.com/library/Heatmap/2.0/src/Heatmap_min.js"></script>
 
-
-    <title>叠加麻点图Demo</title>
+    <title>WaterLogging</title>
 </head>
 <body>
-    <div id="header">
-        <h1>Waterlogging Mashup</h1>
-    </div>
-    <div id="search">
-        <input type="search" id="keywords" placehoder="输入地点">
-        <button id="searchBtn">搜索</button>
-    </div>
-
-    <div id="result">
-         <ul id="resultList">
-
-         </ul>
-    </div>
-
-    <div id="l-map"></div>
-
-           <!--城市列表-->
-    <div class="sel_container">
-        <strong id="curCity">北京市</strong>
-        [<a id="curCityText" href="javascript:void(0)">更换城市</a>]
-    </div>
-    <div class="map_popup" id="cityList" style="display:none;">
-        <div class="popup_main">
-            <div class="title">城市列表</div>
-            <div class="cityList" id="citylist_container"></div>
-            <button id="popup_close"></button>
+    <div id="pageHeader">
+        <div class="container">
+            <h1>内涝查询</h1>
+            <h2>北京</h2>
         </div>
     </div>
+
+    <div id="pageMiddle">
+        <div class="container" id = "header">
+            <div id="filterBox">
+            </div>
+            <div id="toolsBar" class="clearfix">
+                <div class="pull-left">
+                    <input type="search" id="keyword" class="input-large search-query" placeholder="输入检索关键字">
+                    <span class="btn btn-primary" id="searchBtn">搜索</span>
+                </div>
+                <div class="pull-right">
+                    <span class="btn btn-primary" id="switch">热力图</span>
+                </div>
+                <div class="row-fluid show-grid pull-left" id="selectedValue">
+                </div>
+            </div>
+        </div> <!-- /container -->
+    </div>
+
+
+    <div id="mapBox">
+        <div id="map" class="pull-left"></div>
+        <div id="mapPanel" class="pull-right">
+            <div id="mapListWrap">
+                <table class="table table-hover">
+                    <tbody id="mapList">
+                    </tbody>
+                </table>
+            </div>
+            <div id="mapPager" class="pagination text-center"></div>
+        </div>
+    </div>
+
+
     <div>
-        <p id="myTest">testsdwdqwfwfewfwerfewfewfsfsgggg</p>
+        <p id="myTest"></p>
     </div>
 
 
