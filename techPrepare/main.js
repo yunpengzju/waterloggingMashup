@@ -1,22 +1,29 @@
 var map;
 var point;
 var customLayer = null;
+var heatmapOverlay = null;
 var page = 0;     // 当前页面
 var points = [];  // 符合要求的点集
+var weightedPoints = []; // 用于绘制热力图
 var flag = 0;  // 0为正常地图，1为热力图
+var keyword = "";
 
+// 城市相关信息
+var cityName = "北京";
+var currentLocation = '116.403694,39.927552';
+
+// 初始化
 $(document).ready(function() {
     map = new BMap.Map("map");          // 创建地图实例
     point = new BMap.Point(116.403694,39.927552);  // 创建点坐标
     map.centerAndZoom(point, 15);                 // 初始化地图，设置中心点坐标和地图级别
     map.enableScrollWheelZoom();
     map.addControl(new BMap.NavigationControl());  //添加默认缩放平移控件
-    //addCustomLayer();
+    addCustomLayer();
     searchAction();
     $('#searchBtn').on('click', search);
     $('#switch').on('click', switchMap);
 });
-
 
 // 用于测试
 function printTest(s)
@@ -25,29 +32,32 @@ function printTest(s)
     p.innerHTML = s;
 }
 
-
 // 执行本地搜索
 function search(){
-    var key = $('#keyword').val();
-    searchAction(key);
+    keyword = $('#keyword').val();
+    searchAction(keyword);
 }
 
 // 执行LBS云检索，并调用renderMap函数绘制地图
 // keyword为检索关键词，默认为空
 // page为当前页码，默认为0
-function searchAction(keyword, page) {
-    page = page || 0;
-
+function searchAction(keyword, t_page) {
+    page = t_page || 0;
     var filter = []; //过滤条件
     var url = "http://api.map.baidu.com/geosearch/v3/local?";
     $.getJSON(url, {
         'q'          : keyword, //检索关键字
         'filter'     : '',  //过滤条件
-        'geotable_id': 59591,
+        'location'   : currentLocation,
+        'radius'     : 1000,
+        'geotable_id': 61976,
+        'region'     : cityName,
+        'page_index' : page,
+        'page_size'  : 10,
         'ak'         : '7xfCf9eh3Gdfdf4U2UoCqNxC'  //用户ak
     },function(e) {
         var content = e.contents;
-        renderMap(e);
+        renderMap(e, page+1);
     });
 
 }
@@ -70,7 +80,7 @@ function renderMap(res, page) {
         var point = new BMap.Point(item.location[0], item.location[1]),
             marker = new BMap.Marker(point);
         points.push(point);
-        var tr = $("<tr><td width='75%'><a href='www.baidu.com' target='_blank' >" + item.title + "<a/><br/>" + item.address + "</td></tr>").click(showInfo);
+        var tr = $("<tr><td width='75%'><a href='http://www.baidu.com' target='_blank' >" + item.title + "<a/><br/>" + item.address + "</td></tr>").click(showInfo);
         $('#mapList').append(tr);;
         marker.addEventListener('click', showInfo);
         function showInfo() {
@@ -104,11 +114,15 @@ function renderMap(res, page) {
     }
     function PageClick (pageclickednumber) {
         pageclickednumber = parseInt(pageclickednumber);
-        $("#pager").pager({ pagenumber: pageclickednumber, pagecount: pagecount, showcount: 3, buttonClickCallback: PageClick });
-        searchAction(keyword, pageclickednumber -1);
+        $("#mapPager").pager({ pagenumber: pageclickednumber, pagecount: pagecount, showcount: 3, buttonClickCallback: PageClick });
+        searchAction(keyword, pageclickednumber-1);
+        if (1 == flag) {
+            flag = 0;
+            $("#switch").html("热力图");
+        }
     }
-    $("#mapPager").pager({ pagenumber: page, pagecount: pagecount, showcount:3, buttonClickCallback: PageClick });
 
+    $("#mapPager").pager({ pagenumber: page, pagecount: pagecount, showcount:3, buttonClickCallback: PageClick });
     map.setViewport(points);
 }
 // 切换当前地图，如果当前为普通地图（flag = 0） 则切换为热力图
@@ -116,12 +130,17 @@ function renderMap(res, page) {
 function switchMap(){
     if (0 == flag) {
         flag = 1;
+        map.clearOverlays();
         drawHeatMap();
         $("#switch").html("普通地图");
     }
     else {
         flag = 0;
+        if (heatmapOverlay) {
+            map.removeTileLayer(heatmapOverlay);
+        }
         searchAction();
+        addCustomLayer();
         $("#switch").html("热力图");
     }
 }
@@ -132,49 +151,92 @@ function drawHeatMap() {
     }
     heatmapOverlay = new BMapLib.HeatmapOverlay({"radius":20});
     map.addOverlay(heatmapOverlay);
-    heatmapOverlay.setDataSet({data:points,max:100});
+    getHeatedPoints();
+    heatmapOverlay.setDataSet({data:weightedPoints,max:100});
 }
 
-// 验证浏览器是否支持画布，如果不支持则无法绘制热力图
+//验证浏览器是否支持画布，如果不支持则无法绘制热力图
 function isSupportCanvas(){
     var elem = document.createElement('canvas');
     return !!(elem.getContext && elem.getContext('2d'));
 }
 
+function getHeatedPoints(){
+    var totalPage = 0;
+    weightedPoints = [];
+    var url = "http://api.map.baidu.com/geosearch/v3/local?";
+    $.ajaxSettings.async = false;
+    $.getJSON(url, {
+        'q'          : keyword, //检索关键字
+        'filter'     : '',  //过滤条件
+        'location'   : currentLocation,
+        'radius'     : 1000,
+        'geotable_id': 61976,
+        'region'     : cityName,
+        'page_index' : page,
+        'page_size'  : 10,
+        'ak'         : '7xfCf9eh3Gdfdf4U2UoCqNxC'  //用户ak
+    },function(e) {
+        var total = e.total;
+        totalPage = Math.ceil(total/10);
+    });
+    for(var index = 0; index < totalPage; index++)
+    {
+        $.getJSON(url, {
+        'q'          : keyword, //检索关键字
+        'filter'     : '',  //过滤条件
+        'location'   : currentLocation,
+        'radius'     : 1000,
+        'geotable_id': 61976,
+        'region'     : cityName,
+        'page_index' : index,
+        'page_size'  : 10,
+        'ak'         : '7xfCf9eh3Gdfdf4U2UoCqNxC'  //用户ak
+        },function(e) {
+            var content = e.contents;
+            $.each(content, function(i, item){
+                var point = {'lng': item.location[0], 'lat': item.location[1], 'count':item.hz_type+20 };
+                weightedPoints.push(point);
+            });
+        });
+    }
+}
 
-// wait to delete
-// function addCustomLayer(keyword) {
-//     if (customLayer) {
-//         map.removeTileLayer(customLayer);
-//     }
-//     customLayer=new BMap.CustomLayer({
-//         geotableId: 59591,
-//         q: keyword, //检索关键字
-//         tags: '', //空格分隔的多字符串
-//         filter: '' //过滤条件,参考http://developer.baidu.com/map/lbs-geosearch.htm#.search.nearby
-//     });
-//     map.addTileLayer(customLayer);
-//     customLayer.addEventListener('hotspotclick',callback);
-// }
 
-// function callback(e)//单击热点图层
-// {
-//         var customPoi = e.customPoi;//poi的默认字段
-//         var contentPoi=e.content;//poi的自定义字段
-//         var content = '<p style="width:280px;margin:0;line-height:20px;">地址：' + customPoi.address + '<br/>价格:'+contentPoi.dayprice+'元'+'</p>';
-//         var searchInfoWindow = new BMapLib.SearchInfoWindow(map, content, {
-//             title: customPoi.title, //标题
-//             width: 290, //宽度
-//             height: 40, //高度
-//             panel : "panel", //检索结果面板
-//             enableAutoPan : true, //自动平移
-//             enableSendToPhone: true, //是否显示发送到手机按钮
-//             searchTypes :[
-//                 BMAPLIB_TAB_SEARCH,   //周边检索
-//                 BMAPLIB_TAB_TO_HERE,  //到这里去
-//                 BMAPLIB_TAB_FROM_HERE //从这里出发
-//             ]
-//         });
-//         var point = new BMap.Point(customPoi.point.lng, customPoi.point.lat);
-//         searchInfoWindow.open(point);
-// }
+// 麻点图
+function addCustomLayer(keyword) {
+    if (customLayer) {
+        map.removeTileLayer(customLayer);
+    }
+    customLayer=new BMap.CustomLayer({
+        geotableId: 61976,
+        q: keyword, //检索关键字
+        tags: '', //空格分隔的多字符串
+        region     : cityName,
+        filter: '' //过滤条件,参考http://developer.baidu.com/map/lbs-geosearch.htm#.search.nearby
+    });
+    map.addTileLayer(customLayer);
+    customLayer.addEventListener('hotspotclick',callback);
+}
+
+function callback(e)//单击热点图层
+{
+        var customPoi = e.customPoi;//poi的默认字段
+        var contentPoi=e.content;//poi的自定义字段
+        var content = '<p style="width:280px;margin:0;line-height:20px;">地址：' + customPoi.address + '</p>';
+        var searchInfoWindow = new BMapLib.SearchInfoWindow(map, content, {
+            title: customPoi.title, //标题
+            width: 290, //宽度
+            height: 40, //高度
+            panel : "panel", //检索结果面板
+            enableAutoPan : true, //自动平移
+            enableSendToPhone: true, //是否显示发送到手机按钮
+            searchTypes :[
+                BMAPLIB_TAB_SEARCH,   //周边检索
+                BMAPLIB_TAB_TO_HERE,  //到这里去
+                BMAPLIB_TAB_FROM_HERE //从这里出发
+            ]
+        });
+        var point = new BMap.Point(customPoi.point.lng, customPoi.point.lat);
+        searchInfoWindow.open(point);
+}
